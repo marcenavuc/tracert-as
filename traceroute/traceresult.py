@@ -1,34 +1,29 @@
+import re
 from dataclasses import dataclass
 from typing import Dict
 
+RESULT_RE = re.compile(r"\((.+)\)")
 
-@dataclass
+
+@dataclass(repr=True, unsafe_hash=True, frozen=True, eq=True)
 class TraceResult:
-    route: str
-    net_name: str
-    as_zone: str
-    country: str
     is_local: bool
+    route: str = ""
+    net_name: str = ""
+    as_zone: str = ""
+    country: str = ""
 
     @classmethod
-    def get_from_data(cls, addr: str, data: Dict):
+    def get_from_data(cls, data: Dict):
         is_local = data is None
-        route = data.get('route', '') if not is_local else addr
-        net_name = data.get('netname', '') if not is_local else ''
-        as_zone = data.get('origin', '') if not is_local else ''
-        country = data.get('country', '') if not is_local else ''
-        return cls(route, net_name, as_zone, country, is_local)
+        if not is_local:
+            route = data.get('route', '')
+            net_name = data.get('netname', '')
+            as_zone = data.get('origin', '')
+            country = data.get('country', '')
+            return cls(is_local, route, net_name, as_zone, country)
+        return cls(is_local)
 
-    def __str__(self) -> str:
-        result = f'{self.route}\n'
-        if self.is_local:
-            return f'{result}local'
-        info = []
-        if self.net_name:
-            info.append(self.net_name)
-        if self.as_zone:
-            info.append(self.as_zone[2:])
-        if self.country and self.country != 'EU':
-            info.append(self.country)
-        return result + ', '.join(info) if len(info) > 0 \
-            else '*\t'
+    def __str__(self):
+        return re.findall(RESULT_RE, self.__repr__())[0]
+
