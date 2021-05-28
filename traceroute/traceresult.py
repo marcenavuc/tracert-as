@@ -25,5 +25,5 @@ class TraceResult:
         return cls(is_local)
 
     def __str__(self):
-        return re.findall(RESULT_RE, self.__repr__())[0]
-
+        # return re.findall(RESULT_RE, self.__repr__())[0]
+        return f"{self.route}\r\n{self.net_name} {self.as_zone} {self.country}"

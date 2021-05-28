@@ -35,14 +35,15 @@ class Tracer:
         whois_addr = self.get_whois_iana_data(addr)
 
         if not whois_addr:
-            return
+            return {"route": addr}
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as whois_sock:
             whois_sock.settimeout(2)
             whois_sock.connect((whois_addr, 43))
             whois_sock.send(addr.encode(encoding='utf-8') + b'\r\n')
             data = self.receive_data(whois_sock)
-            whois_data = self.parse_whois_response(data.decode())
+            whois_data = self.parse_whois_response(data.decode("utf-8",
+                                                               errors="ignore"))
         whois_data['route'] = addr
         return whois_data
 

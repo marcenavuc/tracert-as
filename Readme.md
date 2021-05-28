@@ -9,3 +9,6 @@ sudo python3 -m traceroute [-host]
 
 ## Help
 sudo python3 -m --help
+
+## Example
+sudo python3 -m traceroute ya.ru
